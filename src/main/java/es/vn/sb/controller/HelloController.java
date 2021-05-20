@@ -21,6 +21,7 @@ import brave.Tracer;
 import es.vn.sb.service.HelloService;
 import es.vn.sb.utils.Constants;
 import es.vn.sb.utils.Utils;
+import io.micrometer.core.annotation.Timed;
 
 @RestController
 @RequestMapping("/hello")
@@ -36,10 +37,7 @@ public class HelloController {
 
 	@Value("${spring.application.version}")
 	private String appVersion;
-	
-	@Value("#{systemEnvironment['VERSION']}")
-	String serviceVersion;
-	
+
 	@Autowired
 	Tracer tracer;
 
@@ -48,11 +46,11 @@ public class HelloController {
 		logger.info("START hello():");
 		Span span = tracer.currentSpan();
 		span.tag("controller", "entrada al controller");
-//		headers.forEach((key, value) -> {
-//			logger.info(String.format("Header '%s' = %s", key, value));
-//	    });
+		headers.forEach((key, value) -> {
+			logger.info(String.format("Header '%s' = %s", key, value));
+		});
 		span.annotate("Enviando respuesta desde el servicio-c");
-		return new ResponseEntity<String>(String.format("HELLO from '%s' in pod '%s', pomversion '%s' and serviceversion '%s'\n", appName, Utils.getPodName(), appVersion, serviceVersion),
+		return new ResponseEntity<String>(String.format("HELLO from '%s', version '%s'\n", appName, appVersion),
 				HttpStatus.OK);
 	}
 
@@ -62,55 +60,64 @@ public class HelloController {
 		logger.info("START hello(): sprint: " + sprint);
 
 		return new ResponseEntity<String>(
-				String.format("HELLO from '%s' in sprint: '%s', version: '%s' in pod: '%s', pomversion '%s' and serviceversion '%s'", appName, sprint,
-						appVersion, Utils.getPodName(), appVersion, serviceVersion),
+				String.format("HELLO from '%s' in sprint: '%s', version: '%s'", appName, sprint, appVersion),
 				HttpStatus.OK);
 	}
-
+	
+	@Timed(value = "poc")
 	@RequestMapping(path = "/direct", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> helloDirect() {
-		logger.info("START helloDirect():");
 		Span span = tracer.currentSpan();
 		if (Constants.ERROR == 0) {
+			logger.info("peticion_iniciada");
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(String.format("HELLO from '%s', version '%s' in pod '%s', pomversion '%s' and serviceversion '%s'\n%s", appName,
-					appVersion, Utils.getPodName(), appVersion, serviceVersion, helloService.helloDirect()),
+			return new ResponseEntity<String>(
+					String.format("OK from '%s', version '%s'\n%s", appName, appVersion, helloService.helloDirect()),
 					HttpStatus.OK);
 		}
 
 		if (Utils.getRandomInt() == 1) {
+			try {
+				this.generaError(null);				
+			} catch(Exception e) {
+				logger.info("peticion_ko");
+				logger.error("ERROR controlado", e);
+			}
 			span.annotate("Generamos error en el servicio-c");
-			return new ResponseEntity<String>(String.format("HELLO from '%s', version '%s' in pod '%s', pomversion '%s' and serviceversion '%s'", appName,
-					appVersion, Utils.getPodName(), appVersion, serviceVersion),
+			return new ResponseEntity<String>(String.format("KO from '%s', version '%s'", appName, appVersion),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
+			logger.info("peticion_iniciada");
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(String.format("HELLO from '%s', version '%s' in pod '%s', pomversion '%s' and serviceversion '%s'\n'%s'", appName,
-					appVersion, Utils.getPodName(), appVersion, serviceVersion, helloService.helloDirect()), HttpStatus.OK);
+			return new ResponseEntity<String>(String.format("OK from '%s', version '%s'\n'%s'", appName, appVersion,
+					helloService.helloDirect()), HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(path = "/error", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> error() {
 		logger.info("START error():");
-		
+
 		if (Constants.ERROR == 0) {
-			return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' in pod '%s' and error '%d', pomversion '%s' and serviceversion '%s'", appName,
-					appVersion, Utils.getPodName(), Constants.ERROR, appVersion, serviceVersion), HttpStatus.OK);
-		} 
-		return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' in pod '%s' and error '%d', pomversion '%s' and serviceversion '%s'", appName,
-				appVersion, Utils.getPodName(), Constants.ERROR, appVersion, serviceVersion),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' and error '%d'",
+					appName, appVersion, Constants.ERROR), HttpStatus.OK);
+		}
+		return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' and error '%d'", appName,
+				appVersion, Constants.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@RequestMapping(path = "/error/{error}", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> helloError(@PathVariable int error) {
 		logger.info("START helloError():");
 		Constants.ERROR = error;
-		
-		return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' in pod: '%s', error '%d', pomversion '%s' and serviceversion '%s'", appName,
-				appVersion, Utils.getPodName(), error, appVersion, serviceVersion),
+
+		return new ResponseEntity<String>(
+				String.format("ERROR value from '%s', version '%s', error '%d'", appName, appVersion, error),
 				HttpStatus.OK);
+	}
+	
+	private void generaError(Object obj) {
+		obj.toString();
 	}
 
 }
