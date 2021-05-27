@@ -8,5 +8,5 @@ data:
   SPRING_PROFILES_ACTIVE: dev
   TZ: 'Europe/Madrid'
   TRACES_ENDPOINT: 'http://jaeger-collector.istio-system.svc.cluster.local:9411'
-  SERVICE_NODEJS_1: 'http://service-nodejs-1-svc/service-nodejs-1/time'
+  SERVICE_NODEJS_1_URL: 'http://service-nodejs-1-svc/service-nodejs-1/time'
   
