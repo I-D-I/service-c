@@ -64,7 +64,6 @@ public class HelloController {
 				HttpStatus.OK);
 	}
 	
-	@Timed(value = "poc")
 	@RequestMapping(path = "/direct", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> helloDirect() {
 		Span span = tracer.currentSpan();
