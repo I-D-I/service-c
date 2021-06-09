@@ -50,7 +50,7 @@ public class HelloController {
 			logger.info(String.format("Header '%s' = %s", key, value));
 		});
 		span.annotate("Enviando respuesta desde el servicio-c");
-		return new ResponseEntity<String>(String.format("OK - '%s''%s'\n", appName),
+		return new ResponseEntity<String>(String.format("OK - %s\n", appName),
 				HttpStatus.OK);
 	}
 
@@ -71,7 +71,7 @@ public class HelloController {
 			logger.info("peticion_iniciada");
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
 			return new ResponseEntity<String>(
-					String.format("OK - '%s'\n%s", appName, helloService.helloDirect()),
+					String.format("OK - %s\n%s", appName, helloService.helloDirect()),
 					HttpStatus.OK);
 		}
 
@@ -83,12 +83,12 @@ public class HelloController {
 				logger.error("ERROR controlado", e);
 			}
 			span.annotate("Generamos error en el servicio-c");
-			return new ResponseEntity<String>(String.format("KO from '%s', version '%s'", appName, appVersion),
+			return new ResponseEntity<String>(String.format("KO - %s, version '%s'", appName, appVersion),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
 			logger.info("peticion_iniciada");
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(String.format("OK from '%s', version '%s'\n'%s'", appName, appVersion,
+			return new ResponseEntity<String>(String.format("OK - %s, version '%s'\n'%s'", appName, appVersion,
 					helloService.helloDirect()), HttpStatus.OK);
 		}
 	}
