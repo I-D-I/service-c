@@ -50,7 +50,7 @@ public class HelloController {
 			logger.info(String.format("Header '%s' = %s", key, value));
 		});
 		span.annotate("Enviando respuesta desde el servicio-c");
-		return new ResponseEntity<String>(String.format("HELLO from '%s', version '%s'\n", appName, appVersion),
+		return new ResponseEntity<String>(String.format("OK - '%s''%s'\n", appName),
 				HttpStatus.OK);
 	}
 
@@ -60,7 +60,7 @@ public class HelloController {
 		logger.info("START hello(): sprint: " + sprint);
 
 		return new ResponseEntity<String>(
-				String.format("HELLO from '%s' in sprint: '%s', version: '%s'", appName, sprint, appVersion),
+				String.format("OK - '%s' in sprint: '%s', version: '%s'", appName, sprint, appVersion),
 				HttpStatus.OK);
 	}
 	
@@ -71,7 +71,7 @@ public class HelloController {
 			logger.info("peticion_iniciada");
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
 			return new ResponseEntity<String>(
-					String.format("OK from '%s', version '%s'\n%s", appName, appVersion, helloService.helloDirect()),
+					String.format("OK - '%s'\n%s", appName, helloService.helloDirect()),
 					HttpStatus.OK);
 		}
 
