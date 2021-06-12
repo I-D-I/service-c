@@ -15,7 +15,7 @@ public class PedidoServiceImpl implements PedidoService {
     @Autowired
     private RestTemplate restTemplate;
     
-    @Value("${service-nodejs-1.url}")
+    @Value("${service-nodejs-1.pedido.url}")
     String serviceNodeJS1PedidoURL;
 
     @Autowired
