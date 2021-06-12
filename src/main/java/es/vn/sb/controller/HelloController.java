@@ -18,19 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import brave.Span;
 import brave.Tracer;
-import es.vn.sb.service.HelloService;
+import es.vn.sb.service.PedidoService;
 import es.vn.sb.utils.Constants;
-import es.vn.sb.utils.Utils;
-import io.micrometer.core.annotation.Timed;
 
 @RestController
-@RequestMapping("/hello")
+@RequestMapping("/api")
 public class HelloController {
 
 	private static final Logger logger = LoggerFactory.getLogger(HelloController.class);
 
 	@Autowired
-	HelloService helloService;
+	PedidoService helloService;
 
 	@Value("${spring.application.name}")
 	private String appName;
@@ -64,35 +62,6 @@ public class HelloController {
 				HttpStatus.OK);
 	}
 	
-	@RequestMapping(path = "/direct", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-	public HttpEntity<String> helloDirect() {
-		Span span = tracer.currentSpan();
-		if (Constants.ERROR == 0) {
-			logger.info("peticion_iniciada");
-			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(
-					String.format("OK - %s\n%s", appName, helloService.helloDirect()),
-					HttpStatus.OK);
-		}
-
-		if (Utils.getRandomInt() == 1) {
-			try {
-				this.generaError(null);				
-			} catch(Exception e) {
-				logger.info("peticion_ko");
-				logger.error("ERROR controlado", e);
-			}
-			span.annotate("Generamos error en el servicio-c");
-			return new ResponseEntity<String>(String.format("KO - %s, version '%s'", appName, appVersion),
-					HttpStatus.INTERNAL_SERVER_ERROR);
-		} else {
-			logger.info("peticion_iniciada");
-			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(String.format("OK - %s, version '%s'\n'%s'", appName, appVersion,
-					helloService.helloDirect()), HttpStatus.OK);
-		}
-	}
-
 	@RequestMapping(path = "/error", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> error() {
 		logger.info("START error():");
@@ -115,8 +84,4 @@ public class HelloController {
 				HttpStatus.OK);
 	}
 	
-	private void generaError(Object obj) {
-		obj.toString();
-	}
-
 }

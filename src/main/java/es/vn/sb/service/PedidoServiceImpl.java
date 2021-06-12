@@ -7,24 +7,25 @@ import org.springframework.web.client.RestTemplate;
 
 import brave.Span;
 import brave.Tracer;
+import es.vn.sb.model.Pedido;
 
 @Service
-public class HelloServiceImpl implements HelloService {
+public class PedidoServiceImpl implements PedidoService {
 
     @Autowired
-    private RestTemplate myRestTemplate;
+    private RestTemplate restTemplate;
     
     @Value("${service-nodejs-1.url}")
-    String url;
+    String serviceNodeJS1PedidoURL;
 
     @Autowired
     Tracer tracer;
     
-	public String helloDirect() {
+	public String createPedido(Pedido pedido) {
 		Span span = tracer.currentSpan();
 		span.tag("service", "entrada al servicio");
-		span.annotate(String.format("Llamada al servicio con url %s", url));
-		return myRestTemplate.getForEntity(url, String.class).getBody();
+		span.annotate(String.format("Llamada al servicio con url %s", serviceNodeJS1PedidoURL));
+		return restTemplate.postForEntity(serviceNodeJS1PedidoURL, pedido, String.class).getBody();
 	}
     
 }   
