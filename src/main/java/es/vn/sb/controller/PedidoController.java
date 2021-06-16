@@ -61,7 +61,7 @@ public class PedidoController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(String.format("OK - %s\n'%s'", appName,
+			return new ResponseEntity<String>(String.format("OK - %s\n%s", appName,
 					pedidoServicio.createPedido(pedido)), HttpStatus.OK);
 		}
 	}
