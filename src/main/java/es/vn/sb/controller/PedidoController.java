@@ -49,7 +49,7 @@ public class PedidoController {
 					HttpStatus.OK);
 		}
 
-		if (Utils.getRandomInt() == 1) {
+//		if (Utils.getRandomInt() == 1) {
 			try {
 				this.generaError(null);				
 			} catch(Exception e) {
@@ -59,11 +59,11 @@ public class PedidoController {
 			span.annotate("Generamos error en el servicio-c");
 			return new ResponseEntity<String>(String.format("KO - %s", appName),
 					HttpStatus.INTERNAL_SERVER_ERROR);
-		} else {
-			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-			return new ResponseEntity<String>(String.format("OK - %s\n%s", appName,
-					pedidoServicio.createPedido(pedido)), HttpStatus.OK);
-		}
+//		} else {
+//			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
+//			return new ResponseEntity<String>(String.format("OK - %s\n%s", appName,
+//					pedidoServicio.createPedido(pedido)), HttpStatus.OK);
+//		}
 	}
 	
 	private void generaError(Object obj) {
