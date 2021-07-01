@@ -35,37 +35,29 @@ public class PedidoController {
 	@Autowired
 	Tracer tracer;
 
-	
 	@RequestMapping(path = "/pedido", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> createPedido(@RequestBody Pedido pedido) {
-		
+
 		logger.info("peticion_iniciada: {}", pedido.toString());
-		
+
 		Span span = tracer.currentSpan();
 		if (Constants.ERROR == 0) {
 			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
 			return new ResponseEntity<String>(
-					String.format("OK - %s\n%s", appName, pedidoServicio.createPedido(pedido)),
-					HttpStatus.OK);
+					String.format("OK - %s\n%s", appName, pedidoServicio.createPedido(pedido)), HttpStatus.OK);
 		}
 
-//		if (Utils.getRandomInt() == 1) {
-			try {
-				this.generaError(null);				
-			} catch(Exception e) {
-				logger.info("peticion_ko");
-				logger.error("ERROR controlado", e);
-			}
-			span.annotate("Generamos error en el servicio-c");
-			return new ResponseEntity<String>(String.format("KO - %s", appName),
-					HttpStatus.INTERNAL_SERVER_ERROR);
-//		} else {
-//			span.annotate("Inicio de la peticion sin error en el controller del servicio-c");
-//			return new ResponseEntity<String>(String.format("OK - %s\n%s", appName,
-//					pedidoServicio.createPedido(pedido)), HttpStatus.OK);
-//		}
+		try {
+			this.generaError(null);
+		} catch (Exception e) {
+			logger.info("peticion_ko");
+			logger.error("ERROR controlado", e);
+		}
+		span.annotate("Generamos error en el servicio-c");
+		return new ResponseEntity<String>(String.format("KO - %s", appName), HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
-	
+
 	private void generaError(Object obj) {
 		obj.toString();
 	}
