@@ -67,13 +67,7 @@ public class HelloController {
 	@RequestMapping(path = "/error", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public HttpEntity<String> error() {
 		logger.info("START error():");
-
-		if (Constants.ERROR == 0) {
-			return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' and error '%d'",
-					appName, appVersion, Constants.ERROR), HttpStatus.OK);
-		}
-		return new ResponseEntity<String>(String.format("ERROR value from '%s', version '%s' and error '%d'", appName,
-				appVersion, Constants.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<String>(String.format("%s", Constants.ERROR), HttpStatus.OK);
 	}
 
 	@CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.OPTIONS })
