@@ -77,7 +77,7 @@ public class HelloController {
 		Constants.ERROR = error;
 
 		return new ResponseEntity<String>(
-				String.format("ERROR value from '%s', version '%s', error '%d'", appName, appVersion, error),
+				String.format("Valor de ERROR en '%s': '%d'", appName, error),
 				HttpStatus.OK);
 	}
 	
